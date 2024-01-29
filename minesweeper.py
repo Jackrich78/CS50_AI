@@ -164,6 +164,7 @@ class Sentence():
         else:
             return
 
+
 class MinesweeperAI():
     """
     Minesweeper game player
