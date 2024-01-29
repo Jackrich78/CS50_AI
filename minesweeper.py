@@ -162,20 +162,7 @@ class Sentence():
         
         # if cell is not in the sentence then no action needed
         else:
-            return 
-"""
-# TESTING BLOCK
-sentence = Sentence({(0, 0), (0, 1), (1,0)}, 1)
-
-print(f"Before: {sentence}")
-
-# sentence.mark_mine((0, 0))
-sentence.mark_safe((0, 1))
-
-print(f"After: {sentence}")
-assert (0 , 1) not in sentence.cells
-assert sentence.count == 1
-"""
+            return
 
 class MinesweeperAI():
     """
@@ -237,9 +224,6 @@ class MinesweeperAI():
         # mark cell as safe
         self.safes.add(cell)
         for sentence in self.knowledge:
-            #debugging
-            print(f"Object type: {type(sentence)}")  # Should output: <class '__main__.Sentence'>
-            print(f"Does object have 'mark_safe'? {'mark_safe' in dir(sentence)}")  # Should output: True
             sentence.mark_safe(cell)
 
         # add sentence to knowledge base
@@ -255,8 +239,8 @@ class MinesweeperAI():
                 ni, nj = dif_i + i ,dif_j + j
             
                 # if cell is within the board bounds:
-                if ni < self.height and nj < self.width:
-                    #if position is not in self.safes or self.mines:
+                if 0 <= ni < self.height and 0 <= nj < self.width:
+                    # if position is not in self.safes or self.mines:
                     if (ni, nj) not in self.safes and (ni, nj) not in self.mines:
                         neighbours.add((ni, nj))
             
@@ -344,41 +328,3 @@ class MinesweeperAI():
 
         #else return None
         return None                
-    
-
-# Test for MinesweeperAI
-
-# Initialize the AI
-ai = MinesweeperAI()
-
-# Scenario 1: Simulate the AI knowing a cell is safe and updating knowledge
-print("Scenario 1: Adding knowledge about a safe cell with 1 neighboring mine.")
-ai.add_knowledge((1, 1), 1)
-
-# Expected: AI should recognize surrounding cells and infer one is a mine
-print("AI Knowledge after Scenario 1:")
-for sentence in ai.knowledge:
-    print(sentence)
-
-print("AI Knowledge before assert:")
-for sentence in ai.knowledge:
-    print(sentence)
-
-# Verify the results
-assert any(s == Sentence({(0, 0), (0, 1), (0, 2), (1, 0), (1, 2), (2, 0), (2, 1), (2, 2)}, 1) for s in ai.knowledge), "Knowledge should contain the sentence with 8 neighbors and 1 mine."
-
-# Scenario 2: Simulate the AI finding another safe cell that allows it to infer a mine
-print("\nScenario 2: Adding knowledge about another safe cell that helps infer a mine.")
-ai.add_knowledge((0, 0), 0)
-
-# Expected: AI should mark cells around (0, 0) as safe and infer mines based on previous knowledge
-print("AI Knowledge after Scenario 2:")
-for sentence in ai.knowledge:
-    print(sentence)
-print("AI Safe cells:", ai.safes)
-print("AI Mines:", ai.mines)
-
-# Add more scenarios as needed, especially edge cases and complex situations
-
-# Reminder to validate the changes and ensure the results match expectations
-# Assert statements or manual checks can be used to verify the AI's internal state
