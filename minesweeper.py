@@ -243,6 +243,9 @@ class MinesweeperAI():
                     # if position is not in self.safes or self.mines:
                     if (ni, nj) not in self.safes and (ni, nj) not in self.mines:
                         neighbours.add((ni, nj))
+                    # change count if neighbour cell is a known mine
+                    elif (ni, nj) in self.mines:
+                        count -= 1
             
         # add new sentence with neighbours and count
         if neighbours:
@@ -272,6 +275,7 @@ class MinesweeperAI():
                         changed = True
 
                 # update sentences in knowledge base
+                new_knowledge = []
                 # Infer new sentences from current ones
                 for sentence1 in self.knowledge:
                     for sentence2 in self.knowledge:
@@ -283,10 +287,23 @@ class MinesweeperAI():
                             #if there are new cells add to the knolwedge base
                             if new_cells:
                                 new_sentence = Sentence(new_cells, new_count)
-                                if new_sentence not in self.knowledge:
-                                    self.knowledge.append(new_sentence)
+                                if new_sentence not in self.knowledge and new_sentence not in new_knowledge:
+                                    new_knowledge.append(new_sentence)
                                     changed = True
 
+                # check new sentences
+                for new_sentence in new_knowledge:
+                    if new_sentence not in self.knowledge:
+                        self.knowledge.append(new_sentence)
+                        changed = True
+                        if new_sentence.count == 0:
+                            # all cells are safe
+                            for cell in set(new_sentence.cells):
+                                self.mark_safe(cell)
+                        elif len(new_sentence.cells) == new_sentence.count:
+                            # all cells are mines
+                            for cell in set(new_sentence.cells):
+                                self.mark_mine(cell)
                 
                 # remove any empty sentences still in the knowledge base
                 self.knowledge = [s for s in self.knowledge if len(s.cells) > 0]
@@ -320,7 +337,7 @@ class MinesweeperAI():
         all_cells = set((i, j) for i in range(self.height) for j in range(self.width))
 
         # exclude already chosen, mines and safe cells
-        possible_moves = all_cells - set.moves_made - self.mines - self.safes
+        possible_moves = all_cells - self.moves_made - self.mines - self.safes
 
         # if there are possible moves choose one at random
         if possible_moves:
