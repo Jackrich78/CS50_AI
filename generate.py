@@ -150,11 +150,6 @@ class CrosswordCreator():
 
         return revised    
 
-        # where the overlap check possible letter matches
-        # letters must be equal
-        # return true if revision was made
-        # return false if no revision made
-
 
     def ac3(self, arcs=None):
         """
@@ -165,11 +160,24 @@ class CrosswordCreator():
         Return True if arc consistency is enforced and no domains are empty;
         return False if one or more domains end up empty.
         """
-        # Use the AC3 algorithm
-        # take in arcs list if there is one
-
-        # if change is made to domain
-            # call revise function 
+        
+        # create a list of arcs
+        if arcs is None:
+            arcs = []
+            for x in self.crossword.variables:
+                for y in self.crossword.neighbors(x):
+                    arcs.append((x, y))
+        
+        while arcs:
+            x, y = arcs.pop(0)   # remove first arc from queue
+            
+            if self.revise(x, y):
+                if not self.domains[x]:  # if x is empty return false
+                    return False
+                for z in self.crossword.neighbors(x) - {y}:  # exclude y from neighbours to avoid adding it back
+                    arcs.append((z, x))
+        #  return true if all variables are arc consistent
+        return True
 
     def assignment_complete(self, assignment):
         """
