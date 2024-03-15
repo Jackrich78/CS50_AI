@@ -88,6 +88,7 @@ def load_data(data_dir):
     # return image_data, label_data
     return images_data, labels_data
 
+
 def get_model():
     """
     Returns a compiled convolutional neural network model. Assume that the
@@ -105,31 +106,31 @@ def get_model():
     model.add(tf.keras.layers.Conv2D( 
         # includes kernel size, and relu activiation
         filters=64,
-        kernel_size=(5,5),
+        kernel_size=(5, 5),
         activation='relu',
     ))
         
     # Add a max pooling layer to reduce spatial dimensions
     model.add(tf.keras.layers.MaxPooling2D(
-        pool_size=(2,2),
-        strides=(2,2), # common to have the same as pool size
-        padding='same' # valid = no padding
+        pool_size=(2, 2),
+        strides=(2, 2),  # common to have the same as pool size
+        padding='same'  # valid = no padding
     ))
 
     # Second convultional and pooling layers
-        # Add a convolutional layer
+    # Add a convolutional layer
     model.add(tf.keras.layers.Conv2D( 
         # includes kernel size, and relu activiation
         filters=128,
-        kernel_size=(3,3),
+        kernel_size=(3, 3),
         activation='relu',
     ))
         
     # Add a max pooling layer to reduce spatial dimensions
     model.add(tf.keras.layers.MaxPooling2D(
-        pool_size=(2,2),
-        strides=(2,2), # common to have the same as pool size
-        padding='same' # valid = no padding
+        pool_size=(2, 2),
+        strides=(2, 2),  # common to have the same as pool size
+        padding='same'  # valid = no padding
     ))
 
     # Flatten the output image to feed into dense network
@@ -140,24 +141,25 @@ def get_model():
 
     # Add a dense layer with some(?) neurons 
     model.add(tf.keras.layers.Dense(
-        units=128, # number of neurons
+        units=128,  # number of neurons
         activation='relu',
     ))
 
     # Add an output dense layer with num_categories neurons - one for each category
     model.add(tf.keras.layers.Dense(
-        units=NUM_CATEGORIES, # to match number of categories
-        activation='softmax' # use softmax for multi-class classification
+        units=NUM_CATEGORIES,  # to match number of categories
+        activation='softmax'  # use softmax for multi-class classification
     ))
 
     # compile the model 
     model.compile(
         optimizer='Adamax', 
-        loss='categorical_crossentropy', # categorical_crossentropy for multiple categories
-        metrics=['accuracy'] # track accuracy during training
+        loss='categorical_crossentropy',  # categorical_crossentropy for multiple categories
+        metrics=['accuracy']  # track accuracy during training
     )
     # return compiled model
     return model
+
 
 if __name__ == "__main__":
     main()
