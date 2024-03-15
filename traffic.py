@@ -73,7 +73,7 @@ def load_data(data_dir):
                         
             # for all files in the category directory:
             # read image using cv2.imread
-            image = open.cv2.imread(image_path)
+            image = cv2.imread(image_path)
             # resize image to (IMG_WIDTH x IMG_HEIGHT x 3) cv2.resize?  also tf.keras.layers.Resizing
             image = cv2.resize(image, (IMG_WIDTH, IMG_HEIGHT))
             # add image to image_data list
@@ -94,8 +94,70 @@ def get_model():
     `input_shape` of the first layer is `(IMG_WIDTH, IMG_HEIGHT, 3)`.
     The output layer should have `NUM_CATEGORIES` units, one for each category.
     """
-    raise NotImplementedError
+    # Create a Sequential model
+    model = tf.keras.models.Sequential()
 
+    # ensure it accepts the input shape of our image (IMG_WIDTH, IMG_HEIGHT, 3)
+    model.add(tf.keras.layers.Input(
+        shape=(IMG_WIDTH, IMG_HEIGHT, 3)))
+
+    # Add a convolutional layer
+    model.add(tf.keras.layers.Conv2D( 
+        # includes kernel size, and relu activiation
+        filters=64,
+        kernel_size=(5,5),
+        activation='relu',
+    ))
+        
+    # Add a max pooling layer to reduce spatial dimensions
+    model.add(tf.keras.layers.MaxPooling2D(
+        pool_size=(2,2),
+        strides=(2,2), # common to have the same as pool size
+        padding='same' # valid = no padding
+    ))
+
+    # Second convultional and pooling layers
+        # Add a convolutional layer
+    model.add(tf.keras.layers.Conv2D( 
+        # includes kernel size, and relu activiation
+        filters=128,
+        kernel_size=(3,3),
+        activation='relu',
+    ))
+        
+    # Add a max pooling layer to reduce spatial dimensions
+    model.add(tf.keras.layers.MaxPooling2D(
+        pool_size=(2,2),
+        strides=(2,2), # common to have the same as pool size
+        padding='same' # valid = no padding
+    ))
+
+    # Flatten the output image to feed into dense network
+    model.add(tf.keras.layers.Flatten())
+
+    # A dropout layer to reduce overfitting
+    model.add(tf.keras.layers.Dropout(0.3))
+
+    # Add a dense layer with some(?) neurons 
+    model.add(tf.keras.layers.Dense(
+        units=128, # number of neurons
+        activation='relu',
+    ))
+
+    # Add an output dense layer with num_categories neurons - one for each category
+    model.add(tf.keras.layers.Dense(
+        units=NUM_CATEGORIES, # to match number of categories
+        activation='softmax' # use softmax for multi-class classification
+    ))
+
+    # compile the model 
+    model.compile(
+        optimizer='Adamax', 
+        loss='categorical_crossentropy', # categorical_crossentropy for multiple categories
+        metrics=['accuracy'] # track accuracy during training
+    )
+    # return compiled model
+    return model
 
 if __name__ == "__main__":
     main()
